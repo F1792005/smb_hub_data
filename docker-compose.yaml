@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  # Service 1: Giao diện Dashboard
+  web_dashboard:
+    build: .
+    container_name: smb_dashboard
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./data:/app/data   # Map folder data ra ngoài máy thật để không mất dữ liệu
+      - ./logs:/app/logs
+    command: streamlit run src/serving/dashboard.py
+
+  # Service 2: Tự động quét folder (Background Job)
+  folder_watcher:
+    build: .
+    container_name: smb_watcher
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    command: python src/ingestion/folder_watcher.py
+    restart: always

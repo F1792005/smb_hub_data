@@ -1,0 +1,12 @@
+pandas
+openpyxl
+streamlit
+pyyaml
+sqlalchemy
+watchdog
+pytesseract
+pillow
+matplotlib
+fastapi
+uvicorn
+python-multipart

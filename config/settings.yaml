@@ -1,0 +1,46 @@
+# ==========================================
+# CẤU HÌNH HỆ THỐNG SMB DATA HUB
+# ==========================================
+
+# 1. Cấu hình đường dẫn thư mục
+# Hệ thống sẽ tự động tạo các thư mục này nếu chưa có
+data_dirs:
+  upload: "data/uploads"  # Nơi người dùng ném file vào
+  raw: "data/raw"         # Nơi lưu file gốc (Backup)
+  clean: "data/clean"     # Nơi lưu file sạch sau khi xử lý
+  error: "data/error"     # Nơi chứa file lỗi để kiểm tra lại
+
+# 2. Cấu hình Database
+# Sử dụng SQLite (File local) cho đơn giản và hiệu quả với SMB
+database:
+  connection_string: "sqlite:///smb_data_hub.db"
+
+# 3. Cấu hình Schema (Luật kiểm tra dữ liệu)
+# Validator sẽ nhìn tên file để chọn luật áp dụng tương ứng.
+schemas:
+  # --- LUẬT 1: DỮ LIỆU VIỄN THÔNG (TELCO) ---
+  # Áp dụng khi tên file có chứa: "telco", "churn"
+  telco:
+    required: 
+      - "customerID"
+      - "tenure"
+      - "MonthlyCharges"
+      - "TotalCharges"
+      - "Churn"
+
+  # --- LUẬT 2: DỮ LIỆU SINH VIÊN (STUDENT) ---
+  # Áp dụng khi tên file có chứa: "sv", "student", "ds", "class"
+  # Lưu ý: Code Validator đã có logic đổi tên (Alias Mapping) 
+  # nên dù file là "MSV" hay "StudentCode" thì đều sẽ được hiểu là "MaSV"
+  student:
+    required: 
+      - "MaSV"
+      - "HoTen"
+      - "Lop"
+      - "DiemTB"
+
+  # --- LUẬT 3: MẶC ĐỊNH (DEFAULT) ---
+  # Áp dụng cho các file lạ, không khớp từ khóa nào ở trên
+  # Để rỗng [] nghĩa là không bắt buộc cột nào, chỉ cần file đọc được là OK.
+  default:
+    required: []

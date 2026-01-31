@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard & Chatbot UI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #6C5CE7; /* Tím chủ đạo */
+            --primary-light: #A29BFE; /* Tím nhạt */
+            --bg-color: #F8F9FD;      /* Nền trắng xanh rất nhạt */
+            --white: #FFFFFF;
+            --text-dark: #2D3436;
+            --text-grey: #636E72;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            --radius: 16px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            height: 100vh;
+            overflow: hidden; /* Tránh scroll cả trang */
+            display: flex;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        /* --- PHẦN 1: THỐNG KÊ DỮ LIỆU (BÊN TRÁI - 2/3) --- */
+        .dashboard-container {
+            flex: 2; /* Chiếm 2 phần */
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto; /* Cho phép cuộn riêng phần này */
+            padding-right: 10px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .header h1 { font-size: 24px; font-weight: 600; color: var(--primary-color); }
+
+        /* Các thẻ thống kê nhỏ (KPI Cards) */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s;
+        }
+        
+        .card:hover { transform: translateY(-3px); }
+
+        .card-title { font-size: 14px; color: var(--text-grey); margin-bottom: 8px; }
+        .card-value { font-size: 28px; font-weight: 600; color: var(--text-dark); }
+        .card-icon { 
+            float: right; 
+            color: var(--primary-light); 
+            font-size: 24px; 
+            background: rgba(108, 92, 231, 0.1);
+            padding: 10px;
+            border-radius: 12px;
+        }
+
+        /* Khu vực biểu đồ lớn */
+        .chart-section {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            flex-grow: 1; /* Lấp đầy khoảng trống còn lại */
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-placeholder {
+            flex: 1;
+            background: #F1F2F6;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-grey);
+            border: 2px dashed #dfe6e9;
+        }
+
+        /* --- PHẦN 2: CHATBOT (BÊN PHẢI - 1/3) --- */
+        .chat-container {
+            flex: 1; /* Chiếm 1 phần */
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid rgba(108, 92, 231, 0.1);
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            padding: 20px;
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-header h3 { font-size: 16px; font-weight: 600; }
+        .status-dot { width: 8px; height: 8px; background: #00b894; border-radius: 50%; }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #FDFDFD;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Bong bóng chat */
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .message.bot {
+            background-color: #F1F2F6;
+            color: var(--text-dark);
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+        }
+
+        .message.user {
+            background-color: var(--primary-color);
+            color: var(--white);
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+            box-shadow: 0 4px 10px rgba(108, 92, 231, 0.2);
+        }
+
+        .chat-input-area {
+            padding: 15px;
+            border-top: 1px solid #eee;
+            background: var(--white);
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #dfe6e9;
+            border-radius: 25px;
+            outline: none;
+            transition: 0.3s;
+            background: #F8F9FD;
+        }
+
+        .chat-input:focus { border-color: var(--primary-color); background: #fff; }
+
+        .send-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+        }
+        
+        .send-btn:hover { background: #5649c0; transform: scale(1.05); }
+
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <div class="header">
+            <h1>Data Analytics</h1>
+            <div style="font-size: 14px; color: #636E72;">
+                <i class="far fa-calendar-alt"></i> Hôm nay, 31 Th1
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="card">
+                <i class="fas fa-users card-icon"></i>
+                <div class="card-title">Tổng truy cập</div>
+                <div class="card-value">12,450</div>
+            </div>
+            <div class="card">
+                <i class="fas fa-database card-icon"></i>
+                <div class="card-title">Dữ liệu xử lý</div>
+                <div class="card-value">84 GB</div>
+            </div>
+            <div class="card">
+                <i class="fas fa-bolt card-icon"></i>
+                <div class="card-title">Tốc độ phản hồi</div>
+                <div class="card-value">0.4s</div>
+            </div>
+        </div>
+
+        <div class="chart-section">
+            <h3 style="margin-bottom: 15px; font-size: 18px;">Xu hướng dữ liệu</h3>
+            <div class="chart-placeholder">
+                <p>Khu vực hiển thị Biểu đồ / Data Visualization</p>
+            </div>
+        </div>
+        
+        <div class="card" style="flex: 0 0 auto;">
+            <h3 style="margin-bottom: 10px; font-size: 16px;">Logs gần nhất</h3>
+            <div style="color: #636E72; font-size: 14px;">
+                <p style="padding: 8px 0; border-bottom: 1px solid #eee;">• [INFO] Model updated successfully...</p>
+                <p style="padding: 8px 0; border-bottom: 1px solid #eee;">• [WARN] High latency detected in node 2...</p>
+                <p style="padding: 8px 0;">• [INFO] New user session started...</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-container">
+        <div class="chat-header">
+            <div style="background: rgba(255,255,255,0.2); padding: 8px; border-radius: 50%;">
+                <i class="fas fa-robot"></i>
+            </div>
+            <div>
+                <h3>AI Assistant</h3>
+                <div style="display: flex; align-items: center; gap: 5px; font-size: 12px; opacity: 0.9;">
+                    <div class="status-dot"></div> Online
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-messages">
+            <div class="message bot">
+                Xin chào! Tôi có thể giúp gì cho bạn về dữ liệu hôm nay?
+            </div>
+            <div class="message user">
+                Cho tôi xem báo cáo doanh thu tháng này.
+            </div>
+            <div class="message bot">
+                Đang truy xuất dữ liệu... <br>
+                Doanh thu tháng này tăng 15% so với tháng trước.
+            </div>
+        </div>
+
+        <div class="chat-input-area">
+            <input type="text" class="chat-input" placeholder="Nhập câu hỏi...">
+            <button class="send-btn"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+</body>
+</html>
